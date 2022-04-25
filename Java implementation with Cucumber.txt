@@ -1,0 +1,452 @@
+
+$$$$$$$$$$$$$$$$$$$$$$$$ verify Feature File passing input with created value in DB using LIST$$$$$$$$$$$$$$$$ (Last step)
+
+@Setup
+    @SiriusLogin
+  Scenario Outline: Verification of mandatory fields and creation of Dividend offering when Dividend Type is DRIP or Cash and DRIP
+  177785-Check whether the Digital Commission rate text box is mandatory when Calculate Commission by Contact Channel Preference is Checked
+  177787-Check whether the Digital DRIP minimum fee text box is mandatory when Calculate Commission by Contact Channel Preference is Checked
+  177795-verify if the "Dividend offering" is created
+    Given I navigate to Maintenance menu
+    And I navigate to Client Administration menu
+    And I navigate to Offering - SR Div Prx menu
+    And I select Offering - SR Div Prx 'Create' option
+    And I locate a client using Client details "383"
+    And I select Client from the Client search result tab
+    And I click on Next Button
+    And I select Offering Product Type "DividendOffering"
+    And I click on Next Button to select Effective Date
+    And I click on Next Button to redirect MaintainDividendoffering Page
+    When I select Offering status "Active"
+    And I accept alert
+    And I enter Offering full Name "<DividendType>"
+    And I enter Offering short Name "<DividendType>"
+    And I select Transaction Reporting "Yes" button
+    And I navigate to Dividend Associate Offering tab
+    And I enter associate offering value as "92"
+    And I click on Go Button in Dividend associate offering page
+    And I navigate to Dividend Type tab
+    And I select Dividend type as "Cash and DRIP"
+    And I navigate to SCRIP DRIP purchase tab
+    And I click on LocateParty button to find broker
+    And I enter broker related party as "00544032265"
+    And I verify Stamp Duty Applicable to DRIP Purchase with default value as checked
+    And I verify Calculate Commission by Contact Channel Preference with default value as unchecked
+    And I select the checkbox Calculate Commission by Contact Channel Preference
+    And Clear the Digital Commision rate and click submit
+    And Error message text "Digital Commission rate is mandatory when Commission by Contact Channel Preference is Checked" should get displayed
+    And Enter Digital Commision Rate as "999999.99"
+    And Clear the Digital DRIP minimum fee and click submit
+    And Error message "Digital DRIP minimum fee is mandatory when Commission by Contact Channel Preference is Checked" should get displayed
+    And Enter Digital DRIP Minimum Fee as "999999.99"
+    And I click Submit button in Maintain Dividend offering Page
+    And Verify in DB an OfferingFullName created with name "CashAndDRIP"
+    Examples:
+      | DividendType |
+      | CashAndDRIP  |
+      | DRIPOnly     |
+      | CashAndSCRIP |
+      | SCRIPOnly    |
+
+
+Corresponding DB query using List
+-------------------------------------------
+
+public class DividendDBMethods {
+
+    static String environment = System.getProperty("environment.name");
+    static int tableSize = 0;
+
+    static String userName;
+    static String password;
+    static String url;
+    static Connection conn;
+
+    private static void setDBProperties() throws ClassNotFoundException, SQLException {
+        userName = System.getProperty("database.username");
+        password = System.getProperty("database.password");
+        url = System.getProperty("jdbc.connection.string");
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        conn = DriverManager.getConnection(url, userName, password);
+    }
+
+    public static ArrayList<String> getNewDividendOffering(String offeringFullName) throws ClassNotFoundException, SQLException {
+        //Map<String, String> dividendOffering = new HashMap<String, String>();
+        ArrayList<String> dividendOffering=new ArrayList<>();
+
+        setDBProperties();
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select top 1 o.OfferingID as OfferingID,o.OfferingFullName as OfferingFullName,o.OfferingShortName as OfferingShortName ,dso.DigitalCommissionRate as DigitalCommissionRate,dso.DigitalDRIPMinimumFee as DigitalDRIPMinimumFee  from offering o \n" +
+                            "join DividendOffering do on  o.offeringid=do.OfferingID\n" +
+                            "join DividendDRIPSubOffering dso on dso.offeringid=do.offeringid\n" +
+                            "where o.OfferingFullName="+ offeringFullName+ "\n"+
+                             "order by 1 desc;");
+
+            while (rs.next()) {
+//                dividendOffering.put("OfferingID", rs.getString("OfferingID"));
+//                dividendOffering.put("OfferingFullName", rs.getString("OfferingFullName"));
+//                dividendOffering.put("OfferingShortName", rs.getString("OfferingShortName"));
+//                dividendOffering.put("DigitalCommissionRate", rs.getString("DigitalCommissionRate"));
+//                dividendOffering.put("DigitalDRIPMinimumFee", rs.getString("DigitalDRIPMinimumFee"));
+                dividendOffering.add(rs.getString("OfferingID"));
+                dividendOffering.add(rs.getString("OfferingFullName"));
+                dividendOffering.add(rs.getString("OfferingShortName"));
+                dividendOffering.add( rs.getString("DigitalCommissionRate"));
+                dividendOffering.add(rs.getString("DigitalDRIPMinimumFee"));
+            }
+            return dividendOffering;
+        } finally {
+            conn.close();
+        }
+    }
+
+
+
+Corresponding step definition for the DB method
+-----------------------------------------------------------
+
+  /* Anand 16.08.21 */
+    @And("Verify in DB an OfferingFullName created with name {string}")
+    public void verifyInDBAnOfferingFullNameCreatedWithName(String offeringFullName) throws SQLException, ClassNotFoundException {
+        List<String> dividendOffering;
+        dividendOffering=DividendDBMethods.getNewDividendOffering(offeringFullName);
+        Assert.assertEquals(offeringFullName,dividendOffering.get(1));
+    }
+
+
+
+************************************************************************************
+
+$$$$$$$$$$$$$$$$$$$$$$ verify Feature File passing input with created value in DB using MAP$$$$$$$$$$$$$$$$ (Last step)
+
+ @test
+  @Setup
+  @SiriusLogin
+  Scenario: Verification SR Div Prx 'Amend' offering by Amending values
+  177796-verify if the "Dividend offering" is amended
+    Given I navigate to Maintenance menu
+    And I navigate to Client Administration menu
+    And I navigate to Offering - SR Div Prx menu
+    And I select Offering - SR Div Prx Amend option
+    And I select "Offering" from Search for Dropdown
+    And I enter clientid in textbox as "4"
+    And I enter OfferingURN in textbox "1920"
+    And I click search button
+    And I select Offering from the Offering search result tab
+    And I click on Next Button
+    And I click on Next Button to redirect MaintainDividendoffering Page
+    And I navigate to Dividend Type tab
+    And I select Dividend type as "DRIP"
+    And I navigate to SCRIP DRIP purchase tab
+    And I verify Stamp Duty Applicable to DRIP Purchase with default value as checked
+    And I select the checkbox Calculate Commission by Contact Channel Preference
+    And I enter Digital Commision Rate as "3"
+    And I enter Digital DRIP Minimum Fee as "2"
+    And I click Submit button in Maintain Dividend offering Page
+    Then Verify in DB Digital Commision Rate updated as "3.0000" and Digital DRIP Minimum Fee updated as "2.0000" for offeringURN "1920" and client "4"
+
+
+Corresponding DB query using Map
+-------------------------------------------
+
+public class DividendDBMethods {
+
+    static String environment = System.getProperty("environment.name");
+    static int tableSize = 0;
+
+    static String userName;
+    static String password;
+    static String url;
+    static Connection conn;
+
+    private static void setDBProperties() throws ClassNotFoundException, SQLException {
+        userName = System.getProperty("database.username");
+        password = System.getProperty("database.password");
+        url = System.getProperty("jdbc.connection.string");
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        conn = DriverManager.getConnection(url, userName, password);
+    }
+
+  public static Map<String,String> getAmendedDividendOffering(String offeringURN, String clientID) throws ClassNotFoundException, SQLException {
+        Map<String, String> dividendOfferingDetails = new HashMap<String, String>();
+        setDBProperties();
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select dso.DigitalCommissionRate as DigitalCommissionRate,dso.DigitalDRIPMinimumFee as DigitalDRIPMinimumFee \n" +
+                    "from offering o \n" +
+                    "join DividendOffering do on  o.offeringid=do.OfferingID\n" +
+                    "join DividendDRIPSubOffering dso on dso.offeringid=do.offeringid\n" +
+                    "join vClientOffering vc on o.OfferingID=vc.OfferingID\n" +
+                    "join client c on c.ClientID=vc.ClientID\n" +
+                    "where vc.OfferingURN=" +offeringURN+ "and vc.ClientID=" +clientID+";");
+            while (rs.next()) {
+                dividendOfferingDetails.put("DigitalCommissionRate", rs.getString("DigitalCommissionRate"));
+                dividendOfferingDetails.put("DigitalDRIPMinimumFee", rs.getString("DigitalDRIPMinimumFee"));
+            }
+            return dividendOfferingDetails;
+        } finally {
+            conn.close();
+        }
+    }
+}
+
+
+Corresponding step definition for the DB method
+-----------------------------------------------------------
+
+@And("Verify in DB Digital Commision Rate updated as {string} and Digital DRIP Minimum Fee updated as {string} for offeringURN {string} and client {string}")
+    public void verifyInDBDigitalCommisionRateUpdatedAsAndDigitalDRIPMinimumFeeUpdatedAsForOfferingURNAndClient(String digitalCommisionRate, String digitalDRIPMinimumFee, String offeringURN, String clientID) throws SQLException, ClassNotFoundException {
+        Map<String, String> dividendData;
+        dividendData = DividendDBMethods.getAmendedDividendOffering(offeringURN,clientID);
+        Assert.assertEquals(digitalCommisionRate,dividendData.get("DigitalCommissionRate"));
+        Assert.assertEquals(digitalDRIPMinimumFee,dividendData.get("DigitalDRIPMinimumFee"));
+    }
+
+
+
+********************************************************************************
+
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$Corresponding DB query using List and Map$$$$$$$$$$$$$$$$$$$$$$$$$$
+-------------------------------------------------------------------------------------------------------
+
+public static ArrayList<HashMap<String, String>> selectAddressDetailsForGivenAddressID(String addressId) throws SQLException, ClassNotFoundException {
+        setDBProperties();
+
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select a.AddressLine1, a.AddressLine2, a.AddressLine3 from HoldingAddressHistory as h \n" +
+                    "inner join Address as a on a.AddressID=h.AddressID where a.AddressID=" + addressId + ";");
+            ArrayList<HashMap<String, String>> addressDetails = new ArrayList<>();
+            while (rs.next()) {
+                HashMap<String, String> map = new HashMap<>();
+                map.put("AddressLine1", rs. getString("AddressLine1"));
+                map.put("AddressLine2", rs. getString("AddressLine2"));
+                map.put("AddressLine3", rs. getString("AddressLine3"));
+                addressDetails.add(map);
+            }
+            return addressDetails;
+        } finally{
+            conn.close();
+        }
+    }
+
+
+Corresponding step definition for the DB method
+-----------------------------------------------------------
+
+@And("I verify address parameters in DB")
+    public void I_verify_address_parameters_in_Db() throws Throwable {
+        ArrayList<HashMap<String, String>> addressData;
+	addressData = ChangeAddressOnlineDBMethods.selectAddressDetailsForGivenAddressID(addressID);
+        ArrayList <String> addressRetrievedFromDB =new ArrayList<>();
+
+        for(int j=0; j<addressData.size(); j++){
+            addressRetrievedFromDB.add(addressData.get(j).get("AddressLine1"));
+        }
+
+        ArrayList<String> addressArray=new ArrayList<>();
+
+        for(int i=0; i<holdingsList.size(); i++){
+            addressArray.add(generatedAddressLine1.toUpperCase());
+        }
+        assertEquals(addressArray, addressRetrievedFromDB);
+
+    }
+
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$Getting Input from Data Table and checking the values$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+-------------------------------------------------------------------------------------
+
+Feature file
+
+@test
+   @Setup
+   @SiriusLogin
+   Scenario: Performing Dividend Amendment
+      Given I navigate to Maintenance menu
+      And I navigate to Corrections menu
+      And I navigate to Dividend Amendment option
+      And I select Party radio button in Locate party screen
+      And I enter "00395660441" in party text box
+      When I click search button
+      And I Select a holding from Holding search results table
+      And I click on Next Button
+      And I "Locate dividend holding task" screen should be displayed with Task details in table
+      And I select a Task from Task details table
+      When I click on Next Button in Locate dividend holding task
+      Then A "Dividend option amendment" screen should be displayed
+      And I enter Dividend option details
+          |Eligible ShareBalance  |Shares Waived  |Dividend WaiverRate  |Drip Residue BroughtForward  |
+          |4521                   |4520           |.1                   |.1                           |
+     And I click Calculate button
+      When I click on Next Button in DividendOptionAmendmentPage
+      And "Amended dividend output" page should be displayed
+      When I click on Next button in Amended dividend output
+      Then Screen "Dividend Amendment Summary" screen should be displayed
+      And I click on submit button in Dividend Amendment Summary
+
+
+Dividend option Amendment Page
+------------------------------------------
+
+  /* Anand 17.08.21 */
+    public DividendOptionAmendmentPage enterOptionDetails(String eligibleShareBalance,String sharesWaived,String dividendWaiverRate,String dripResidueBroughtForward){
+        setTextOnElement(eligibleShareBalanceNew_Text,eligibleShareBalance);
+        setTextOnElement(sharesWaivedNew_Text,sharesWaived);
+        setTextOnElement(dividendWaiverRateNew_Text,dividendWaiverRate);
+        setTextOnElement(dripResidueBroughtForwardNew_Text,dripResidueBroughtForward);
+        return this;
+    }
+
+
+
+Step dfinition file
+-------------------------
+
+ @And("I enter Dividend option details")
+    public void iEnterDividendOptionDetails(DataTable dividendOptionData) {
+        List<Map<String, String>> details = dividendOptionData.asMaps(String.class, String.class);
+        Map<String, String> documentTemplate = details.get(0);
+        String eligibleShareBalance = documentTemplate.get("Eligible ShareBalance");
+        String sharesWaived = documentTemplate.get("Shares Waived");
+        String dividendWaiverRate = documentTemplate.get("Dividend WaiverRate");
+        String dripResidueBroughtForward = documentTemplate.get("Drip Residue BroughtForward");
+        dividendOptionAmendmentPage.enterOptionDetails(eligibleShareBalance, sharesWaived,
+                dividendWaiverRate, dripResidueBroughtForward);
+        dividendOptionAmendmentPage.clickCalculateButton();
+    }
+
+
+
+
+
+$$$$$$$$$$$$$$$$$$$$$$$$$Getting input from DB and converting in to formatting date format $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+ @test
+  @Setup
+    @SiriusLogin
+  Scenario Outline:
+    Given I navigate to Maintenance menu
+    And I navigate to Client Administration menu
+    And I navigate to Create Client menu
+    When I create new WIT "Non scanned items" "Agree Purchase Dividend Shares" in current work item
+    And I navigate to cancel transaction menu
+    And I click on Submit button in Cancel workitem Transaction page
+    And I select "Task" from Search for Dropdown
+    And I enter Taskid for Agree purchase Dividend shares as "<TASK ID>"
+    When I click search button
+    And Task code are displayed under Task Search Results table
+    And I select a Task from Task Search Results table
+    And I click on Next Button
+    And I verify "Broker details" page should be displayed
+    And I select Broker called check box
+    And I click Next button in Broker Details Page
+    And I verify "DRIP purchase information" page is displayed
+    And I enter Avg share price as "<Avg share price>"
+    And I click validate button
+    And I select confirm share price checkbox
+    And I click submit button in DRIP purchase Information page
+    And I verify "Record DRIP purchase contract note" Record Purchase transaction page is launched
+    And I enter share price as "<Share Price>"
+  -------  And I enter No of shares Purchased for the corresponding "<TASK ID>"
+    And I enter Bargain Ref no. as "<Bargain Ref no.>"
+    And I enter Bargain Date as "<Bargain Date>"
+    And I enter Bargain Time Hour as "<Bargain Time Hour>" and Min as "<Bargain Time MIN>" and Sec as "<Bargain Time SEC>"
+    And I enter Bargain Completion Date as "<Bargain Completion Date>"
+    And I enter Settlement value as "<Settlement value>"
+   ----- And I enter Settlement Date for "<TASK ID>"
+    And I select Place of Trade dropdown value as "<Place of Trade>"
+#    And I enter Schedule Date as "<Schedule Date>"
+#    And I enter Schedule Time Hour as "<Schedule Time Hour>" and Min as "<Schedule Time Min>"
+#    And I click Submit button in Record DRIP purchase contract note Page
+#    Then Page "Work item handoff" screen should be displayed
+#    And I get the updated value of StampDutyDue column and CommissionDue column for the "<HoldingID>" under "<TASK ID>"
+#    And I validate the StampdutyDue and CommissionDue calculated for the "<HoldingID>" under "<TASK ID>" with the DB value
+
+
+
+Step definition
+----------------------------
+
+@And("I enter No of shares Purchased for the corresponding {string}")
+    public void iEnterNoOfSharesPurchasedForTheCorresponing(String taskID) throws SQLException, ClassNotFoundException {
+        Map<String,String> noOfShares;
+        noOfShares=DividendDBMethods.getNoOfSharesPurchased(taskID);
+        System.out.println(noOfShares.get("NumberOfSharesPurchased"));
+        recordDRIPPurchaseContractNotePage.enterNoOfSharesPurchased(noOfShares.get("NumberOfSharesPurchased"));
+    }
+
+
+
+DIVIDEND DB methods
+----------------------------
+
+ public static Map<String, String> getNoOfSharesPurchased(String offeringTaskID) throws ClassNotFoundException, SQLException {
+        Map<String, String> noOfSharesPurchasedDetails = new HashMap<String, String>();
+        setDBProperties();
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select NumberOfSharesPurchased as NumberOfSharesPurchased from DividendDRIPOfferingTask \n" +
+                    "where OfferingTaskID="+offeringTaskID +";");
+            while (rs.next()) {
+                noOfSharesPurchasedDetails.put("NumberOfSharesPurchased", rs.getString("NumberOfSharesPurchased"));
+            }
+            return noOfSharesPurchasedDetails;
+        } finally {
+            conn.close();
+        }
+    }
+
+
+
+
+formatting date
+---------------------------
+
+@And("I enter Settlement Date for {string}")
+    public void iEnterSettlementDateFor(String taskID) throws SQLException, ClassNotFoundException, ParseException {
+        System.out.println(DividendDBMethods.getSettlementDate(taskID));
+        SimpleDateFormat dt=new SimpleDateFormat("yyyyy-MM-dd hh:mm:ss");
+        Date date=dt.parse(DividendDBMethods.getSettlementDate(taskID));
+        System.out.println(date);
+        SimpleDateFormat dt1=new SimpleDateFormat("dd-MMM-yyyy");
+        String formatted=dt1.format(date);
+        System.out.println(formatted);
+        recordDRIPPurchaseContractNotePage.enterSettlementDate(formatted);
+    }
+
+
+2021-10-07 00:00:00.0
+Thu Oct 07 00:00:00 BST 2021
+07-Oct-2021
+
+
+public static String getSettlementDate(String offeringTaskID) throws ClassNotFoundException, SQLException {
+        String settlementDate = new String();
+        setDBProperties();
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select SettlementDate from DividendDRIPOfferingTask\n" +
+                    "where OfferingTaskID=" + offeringTaskID + ";");
+            while (rs.next()) {
+                settlementDate=rs.getString("SettlementDate");
+            }
+            return settlementDate;
+        } finally {
+            conn.close();
+        }
+    }
+
+
+
+
+
+
+

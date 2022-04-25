@@ -1,0 +1,39 @@
+ if (locatedHolderForHoldingPage.verifyTitleOfPage(title)) {
+            basePage.clickOnNextButton();
+            basePage.clickOnNextButton();
+            String workItemHandOffText = "You have finished processing this work item";
+            workItemHandoffPage.verifyResultText(workItemHandOffText);
+            workItemHandoffPage.clickOnHomeButton();
+           /* String workItemHandOffText="You have finished processing this work item";
+            if(workItemHandoffPage.verifyResultText(workItemHandOffText)){
+                workItemHandoffPage.clickOnHomeButton();
+            }
+            else {
+                basePage.clickOnNextButton();
+            }*/
+        } else {
+            basePage.clickOnNextButton();
+            String workItemHandOffText = "You have finished processing this work item";
+            workItemHandoffPage.verifyResultText(workItemHandOffText);
+            workItemHandoffPage.clickOnHomeButton();
+        }
+
+
+
+
+
+
+if (newAddressMatchesHistoricalAddressPage.verifyTitleOfPage(title)) {
+            basePage.clickOnNextButton();
+            String workItemHandOffText = "You have finished processing this work item";
+            if (workItemHandoffPage.verifyResultText(workItemHandOffText)) {
+                workItemHandoffPage.clickOnHomeButton();
+            } else {
+                basePage.clickOnNextButton();
+            }
+        } else {
+            basePage.clickOnNextButton();
+            String workItemHandOffText = "You have finished processing this work item";
+            workItemHandoffPage.verifyResultText(workItemHandOffText);
+            workItemHandoffPage.clickOnHomeButton();
+        }

@@ -1,0 +1,38 @@
+
+    @And("I verify new Payments records are created in payment table for the Corresponding {string} and {string}")
+    public void iVerifyNewPaymentsRecordsAreCreatedInPaymentTableForTheCorrespondingAnd(String clientID, String offeringURN) throws SQLException, ClassNotFoundException {
+        List<String> paymentIDs =sSupportDBMethods.getPaymentIDCreatedInAMF(clientID,offeringURN);
+        for(int i=0; i<paymentIDs.size(); i++) {
+            System.out.println(paymentIDs.get(i));
+        }
+    }
+
+
+ 
+
+
+public static List<String> getPaymentIDCreatedInAMF(String clientID, String OfferingURN) throws SQLException, ClassNotFoundException {
+        setDBProperties();
+
+        List<String> paymentIDs = new ArrayList<>();
+
+        try {
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("select py.PaymentID AS PaymentID from Client c join\n" +
+                    "offering o on c.ClientID=o.ClientID \n" +
+                    "join vClientOffering vco on vco.OfferingID=o.OfferingID\n" +
+                    "join Holding h on h.OfferingID=o.OfferingID\n" +
+                    "join HolderHolding hh on h.HoldingID=hh.HoldingID\n" +
+                    "join partyrole pr on pr.PartyRoleID=hh.PartyRoleID\n" +
+                    "join party p on p.PartyID=pr.PartyID\n" +
+                    "join PaymentOutParty pop on pop.PartyID=p.PartyID\n" +
+                    "join payment py on py.PaymentID=pop.PaymentID\n" +
+                    "where vco.OfferingURN="+OfferingURN+"and c.ClientID="+clientID+"and py.PaymentID in (select top 15 PaymentID from payment order by 1 desc)"+ ";");
+            while (rs.next()) {
+                paymentIDs.add(rs.getString("PaymentID"));
+            }
+            return paymentIDs;
+        } finally {
+            conn.close();
+        }
+    }

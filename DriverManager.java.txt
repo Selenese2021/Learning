@@ -1,0 +1,28 @@
+public class DriverManager {
+
+    public static String remote = System.getProperty("driver.remote");
+    private static String iePath = System.getProperty("webdriver.ie.driver");
+    private static String chromePath = System.getProperty("webdriver.chrome.driver");
+
+    private static String gridUrl = System.getProperty("grid.url");
+    public static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+
+    public static WebDriver getDriver() {
+        return driver.get();
+    }
+
+    public static void setDriver() throws IOException {
+        if (remote.equals("true")) {
+            driver.set(new RemoteWebDriver(new URL(gridUrl), BrowserOptions.getIEOptions()));
+            driver.set(new RemoteWebDriver(new URL(gridUrl), BrowserOptions.getChromeOptions()));
+            Utils.addDebugMessage("driver initiated");
+        } /*else if (remote.equals("false")) {
+            System.setProperty("webdriver.ie.driver", iePath);
+            driver.set(new InternetExplorerDriver(BrowserOptions.getIEOptions()));
+        }*/ else if (remote.equals("false")) {
+            System.setProperty("webdriver.chrome.driver", chromePath);
+            driver.set(new ChromeDriver(BrowserOptions.getChromeOptions()));
+            Utils.addDebugMessage("Chrome driver initiated");
+        }
+    }
+}

@@ -1,0 +1,99 @@
+  /* String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+      
+while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                List<Map<String,String>> mylist=new ArrayList<Map<String, String>>();
+                //0. HoldingID:1234, Rate:0, DRIP:3
+                // 1. HoldingID:999, Rate:1, DRIP:1.5
+
+                Map<String, String> digitalCommisionRateAppliedHolding;
+                digitalCommisionRateAppliedHolding = DividendDBMethods.getDigitalCommissionRateAsTrue(offeringTaskID,HoldingID);
+
+                for(int i=0; i<mylist.size(); i++) {
+                    if(filecontent.contains(mylist.get(i).get(digitalCommisionRateAppliedHolding.get("HoldingID")))) {
+
+                        String re1 = "<([^>]+)>"; // Tag 1
+                        String re2 = "([^<]*)"; // Variable Name 1
+                        String re3 = "</([^>]+)>"; // Tag 2
+                        //String re3 = re1;
+
+                        Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                        Matcher m = p.matcher(filecontent);
+                        while (m.find()) {
+                            String tag1 = m.group(1);
+                            String var1 = m.group(2);
+
+                            System.out.println(tag1.toString());
+                            System.out.println(var1.toString());
+
+
+                            Map<String, String> dividendOfferingParameters;
+                            dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+                            if (tag1.contains("DRIPMF") && var1.contains(dividendOfferingParameters.get("DigitalDRIPMinimumFee"))) {
+
+                                System.out.println("The value in variable is="+var1);
+                                System.out.println(dividendOfferingParameters.get("DigitalDRIPMinimumFee"));
+                                Assert.assertTrue(var1.contains(dividendOfferingParameters.get("DigitalDRIPMinimumFee")));
+
+                        //if(tag.....) assert(mylist.get(i).get(DRIP))
+
+
+
+
+                    }
+                }
+
+
+
+
+
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+                    //
+
+
+                    //if (tag1.contains("DRIPMF") && var1.contains("3.0000")) {
+
+
+
+
+
+
+
+
+
+
+                        //DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        //Map<String, String> dividendOfferingParameters;
+                        //dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+//                        System.out.println(dividendOfferingParameters.get("DigitalDRIPMinimumFee"));
+//                        System.out.println("value from File in DRIPMF TAG" + var1);
+//
+//
+//                        Assert.assertTrue(var1.contains(dividendOfferingParameters.get("DigitalDRIPMinimumFee")));
+//                        System.out.println("Commission Rate value is equal to DRIPMF TAG VALUE");
+
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+*/

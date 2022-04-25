@@ -1,0 +1,83 @@
+package eqtest.sirius.pages;
+
+import eqtest.sirius.utils.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
+
+public class SelectOptionPlansPage extends BaseComponent {
+
+
+    @FindBy(xpath = "//input[contains(@id,'txtSchemeName')]")
+    private WebElement schemeName_Text;
+
+    @FindBy(xpath = "//a[contains(@id,'btnRefine')]")
+    private WebElement refine_Button;
+
+    @FindBy(xpath = "//input[contains(@id,'CheckboxSelector_0')]")
+    private WebElement firstOption_CheckBox;
+
+    @FindBy(xpath = "//table[contains(@id,'dgvPlanExercise')]/tbody/tr")
+    private List<WebElement> rowNumber;
+
+    @FindBy(xpath = "//table[contains(@id,'dgvPlanExercise')]/tbody/tr[2]/td")
+    private List<WebElement> columnNumber;
+
+
+    public SelectOptionPlansPage selectFirstOption() {
+        clickOnElement(firstOption_CheckBox);
+        return this;
+    }
+
+    public List<WebElement> getColumnsNumber() {
+        return columnNumber;
+    }
+
+    public List<WebElement> getRowsNumber() {
+        return rowNumber;
+    }
+
+    public SelectOptionPlansPage selectUnapprovedOptionPlanCheckBox() {
+
+
+        //selectOptionPlansPage.selectFirstOption();
+//         selectOptionPlansPage.getRowsNumber().get(2);
+//        selectOptionPlansPage.getColumnsNumber().get(4);
+
+        // SelectOptionPlansPage selectOptionPlansPage;
+        //List<WebElement> row= selectOptionPlansPage.getRowsNumber();
+//        System.out.println("Row size="+row.size());
+//        List<WebElement> column= selectOptionPlansPage.getColumnsNumber();
+//        System.out.println("Column size"+column.size());
+        // System.out.println(selectOptionPlansPage.getRowsNumber().get(2).getText());
+        // System.out.println("Column value"+selectOptionPlansPage.getColumnsNumber().get(4).getText());
+
+        String before_LastName_Xpath = "//table[contains(@id,'dgvPlanExercise')]/tbody/tr[";
+        String after_LastName_Xpath = "]/td[4]";
+
+        for (int i = 2; i < getRowsNumber().size(); i++) {
+
+//            String lastName = DriverManager.getDriver().findElement(By.xpath(before_LastName_Xpath + i + after_LastName_Xpath)).getText();
+//            System.out.println(lastName);
+
+            String status = DriverManager.getDriver().findElement(By.xpath(before_LastName_Xpath + i + after_LastName_Xpath)).getText();
+            //System.out.println(status);
+
+            if (status.contains("Unapproved"))
+                //Tick the check box
+                DriverManager.getDriver().findElement(By.xpath("//table[contains(@id,'dgvPlanExercise')]/tbody/tr[" + i + "]/td[1]")).click();
+            break;
+        }
+         return this;
+    }
+}
+
+
+
+
+
+
+
+

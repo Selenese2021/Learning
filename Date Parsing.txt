@@ -1,0 +1,21 @@
+I verify the DB updates for Equity Element with name as {string}
+
+ @Then("I verify the DB updates for Equity Element with name as {string}")
+    public void iVerifyTheDBUpdatesForEquityElementWithNameAs(String equityFullName) throws SQLException, ClassNotFoundException, ParseException {
+        ArrayList<HashMap<String, String>> lst = EquityDBMethods.getFutureEffectiveDate1(equityFullName);
+        HashMap<String, String> map = lst.get(0);
+        System.out.println(map.get("EffectiveDate"));
+        System.out.println("UI data"+futureEffectiveDate);
+
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date date = dt.parse(map.get("EffectiveDate"));
+        System.out.println(date);
+        SimpleDateFormat dt1 = new SimpleDateFormat("dd/MMM/yyyy hh:mm");
+        String formatted = dt1.format(date);
+        System.out.println(formatted);
+        Assert.assertTrue(formatted.contains(futureEffectiveDate));
+}
+
+
+
+select EffectiveDate from DatedAttribute where ID=(select EquityID from equity where EquityFullName='"+equityFullName+"')

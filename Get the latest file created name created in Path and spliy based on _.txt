@@ -1,0 +1,36 @@
+ @And("I Get the latest file avaliable in the path")
+    public File iGetTheLatestFileAvaliableInThePath() {
+
+        String dirPath1="\\\\RECLPRERESM905\\StoredProcedureRunner\\OUT";
+            File dir = new File(dirPath1);
+            File[] files = dir.listFiles();
+            if (files == null || files.length == 0) {
+                return null;
+            }
+
+            File lastModifiedFile = files[0];
+            for (int i = 1; i < files.length; i++) {
+                if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+                    lastModifiedFile = files[i];
+                }
+            }
+            System.out.println(lastModifiedFile);
+            String SummaryFileName=lastModifiedFile.toString();
+            System.out.println(SummaryFileName);
+            String ParsedString=SummaryFileName.substring(43,106);
+            System.out.println(ParsedString);
+
+           String[] splittedString = ParsedString.split("_");
+
+           List<String> list = Arrays.asList(splittedString);
+
+
+
+           for (int i=0; i < list.size(); i++){
+            System.out.println(list.get(i));
+           }
+
+
+            return lastModifiedFile;
+
+        }

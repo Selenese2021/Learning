@@ -1,0 +1,30 @@
+ @FindBy(xpath="//table[contains(@id,'tblCertificates')]/tbody/tr/td[1]")
+    private List<WebElement> certificate_Checkbox;
+
+    @FindBy(xpath="//table[contains(@id,'tblCertificates')]/tbody/tr/td[3]")
+    private List<WebElement> certificate_NumberOfShares;
+
+    @FindBy(xpath="//table[contains(@id,'tblCertificates')]/tbody/tr/td[4]")
+    private List<WebElement> certificate_Status;
+
+
+    public EnterCoverDetailsPage selectCertificateCheckBox(){
+
+        for(int i=1;i<certificate_NumberOfShares.size();i++){
+            double numberOfShares=Double.parseDouble(certificate_NumberOfShares.get(i).getText());
+            if(numberOfShares>2.0 && certificate_Status.get(i).getText().contains("Issued"))
+                try{
+                     if(certificate_Checkbox.get(i).getAttribute("checked").equals("true"))
+                        return this;
+                     else {
+                             certificate_Checkbox.get(i).click();
+                    break;
+                    }
+                 }
+                 catch (Exception e) {
+                    System.out.println("Checkbox is not get selected");
+                 }
+
+        }
+        return this;
+    }

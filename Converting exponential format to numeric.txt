@@ -1,0 +1,59 @@
+@And("I validate the StampdutyDue and CommissionDue calculated for the {string} under {string} with the DB value for Stamp Duty Applicable to Drip Purchase is set to False")
+    public void iValidateTheStampdutyDueAndCommissionDueCalculatedForTheUnderWithTheDBValueForStampDutyApplicableToDripPurchaseIsSetToFalse(String holdingID, String taskID) throws SQLException, ClassNotFoundException {
+            Map<String,String> calculatedstampDutyCommissionDues;
+            Map<String,String> stampDutyCommissionDues;
+            stampDutyCommissionDues=DividendDBMethods.getStampDutyDueCommisionDue(holdingID,taskID);
+            calculatedstampDutyCommissionDues = DividendDBMethods.getCalculatedStampDutyCommisionDueParameterasZero(holdingID,taskID);
+            //Assert.assertEquals(stampDutyCommissionDue.get("StampDutyDue"),calculatedstampDutyCommissionDue.get("StampDutyDue"));
+            //Assert.assertEquals(stampDutyCommissionDue.get("CommissionDue"),calculatedstampDutyCommissionDue.get("CommissionDue"));
+            //Assert.assertTrue(calculatedstampDutyCommissionDues.get("StampDutyDue").contains(stampDutyCommissionDues.get("StampDutyDue")));
+            System.out.println(stampDutyCommissionDues.get("StampDutyDue"));
+            System.out.println(calculatedstampDutyCommissionDues.get("StampDutyDue"));
+            //String val =calculatedstampDutyCommissionDues.get("StampDutyDue");
+            //System.out.println(String.format("%.12f",val));
+           //System.out.println(BigDecimal.valueOf(Long.parseLong(calculatedstampDutyCommissionDues.get("StampDutyDue"))));
+//            DecimalFormat df = new DecimalFormat("#");
+//            df.setMaximumFractionDigits(8);
+//            System.out.println(df.format(calculatedstampDutyCommissionDues.get("StampDutyDue")));
+             double Dnumber1=Double.parseDouble(calculatedstampDutyCommissionDues.get("StampDutyDue"));
+            System.out.println(Dnumber1);
+            double Dnumber2=Double.parseDouble(stampDutyCommissionDues.get("StampDutyDue"));
+            System.out.println(Dnumber2);
+            System.out.println(calculatedstampDutyCommissionDues.get("CommissionDue"));
+            System.out.println(stampDutyCommissionDues.get("CommissionDue"));
+            Assert.assertTrue(calculatedstampDutyCommissionDues.get("CommissionDue").contains(stampDutyCommissionDues.get("CommissionDue")));
+            //String str=stampDutyCommissionDue.get("CommissionDue");
+            //String convstr=new BigDecimal(str).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString();
+            //System.out.println(convstr);
+        //Assert.assertTrue(convstr.contains(calculatedstampDutyCommissionDues.get("CommissionDue")));
+            String total2 = String.valueOf(Dnumber1);
+            String total3= String.valueOf(Dnumber2);
+           System.out.println(total2);
+            System.out.println(total3);
+            //Assert.assertTrue(total2.contains(total3));
+            Assert.assertTrue(total2.contains(total3));
+    }
+
+
+
+
+
+0.0000
+0E-12
+0.0
+13.390000
+13.3900
+
+
+
+
+
+converting rounding values
+-----------------------------------
+
+
+//Assert.assertTrue(calculatedstampDutyCommissionDue.get("CommissionDue").contains(stampDutyCommissionDue.get("CommissionDue")));
+          //String str=stampDutyCommissionDue.get("CommissionDue");
+          //String convstr=new BigDecimal(str).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString();
+          //System.out.println(convstr);
+          //Assert.assertTrue(convstr.contains(calculatedstampDutyCommissionDue.get("CommissionDue")));

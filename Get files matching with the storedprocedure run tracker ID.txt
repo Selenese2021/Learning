@@ -1,0 +1,141 @@
+File dir = new File("\\\\RECLPRERESM905\\StoredProcedureRunner\\OUT");
+
+        File[] matches = dir.listFiles(new FilenameFilter()
+        {
+            public boolean accept(File dir, String name)
+            {
+                return name.startsWith("557780"); //&& name.endsWith(".txt");
+            }
+        });
+        List<File> list = Arrays.asList(matches);
+//        for (int i=0; i < list.size(); i++){
+//            System.out.println(list.get(i));
+//        }
+
+//        System.out.println("first element in list="+list.get(0));
+//        System.out.println("second element in list="+list.get(1));
+
+        String SummaryFile=list.get(0).toString();
+        String BankAccountAMF=list.get(1).toString();
+
+//        System.out.println("SummaryFile="+SummaryFile);
+//        System.out.println("BankAccountAMFFile="+BankAccountAMF);
+
+        String ParsedSummaryFile=SummaryFile.substring(43,106);
+        System.out.println(ParsedSummaryFile);
+        String ParsedAccountAMFFile=BankAccountAMF.substring(43,116);
+        System.out.println(ParsedAccountAMFFile);
+
+        String[] splittedString1 = ParsedSummaryFile.split("_");
+        List<String> summaryList = Arrays.asList(splittedString1);
+
+        for(int i=0;i<summaryList.size();i++){
+            System.out.println("Parsed summary List are ="+summaryList.get(i));
+        }
+
+        Assert.assertTrue(summaryList.get(0).contains(sSupportDBMethods.getLatestStoredProcedureRunTrackerID()));
+        Assert.assertTrue(summaryList.get(1).contains("AnnualManagementFee"));
+        Assert.assertTrue(summaryList.get(3).contains("3000"));
+        Assert.assertTrue(summaryList.get(4).contains("20"));
+        Assert.assertTrue(summaryList.get(5).contains("GBP"));
+
+
+
+
+
+        String[] splittedString2 = ParsedSummaryFile.split("_");
+        List<String> annualManagementFeeList = Arrays.asList(splittedString2);
+
+        for(int i=0;i<annualManagementFeeList.size();i++){
+            System.out.println("Parsed summary List are ="+annualManagementFeeList.get(i));
+        }
+
+        Assert.assertTrue(annualManagementFeeList.get(0).contains(sSupportDBMethods.getLatestStoredProcedureRunTrackerID()));
+        Assert.assertTrue(annualManagementFeeList.get(1).contains("AnnualManagementFee"));
+        Assert.assertTrue(annualManagementFeeList.get(3).contains("3000"));
+        Assert.assertTrue(annualManagementFeeList.get(4).contains("20"));
+        Assert.assertTrue(annualManagementFeeList.get(5).contains("GBP"));
+
+
+        return matches;
+
+    }
+
+
+------------------------------------------------------------
+
+
+
+@And("I retrive the latest file filenames based on run tracker id")
+    public File[] iRetriveTheLatestFileFilenamesBasedOnRunTrackerId() throws SQLException, ClassNotFoundException {
+
+        File dir = new File("\\\\RECLPRERESM905\\StoredProcedureRunner\\OUT");
+
+        File[] matches = dir.listFiles(new FilenameFilter()
+        {
+            public boolean accept(File dir, String name)
+            {
+                try {
+                    return name.startsWith(sSupportDBMethods.getLatestStoredProcedureRunTrackerID()); //&& name.endsWith(".txt");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                return false;
+            }
+        });
+        List<File> list = Arrays.asList(matches);
+//        for (int i=0; i < list.size(); i++){
+//            System.out.println(list.get(i));
+//        }
+
+//        System.out.println("first element in list="+list.get(0));
+//        System.out.println("second element in list="+list.get(1));
+
+        String SummaryFile=list.get(0).toString();
+        String BankAccountAMF=list.get(1).toString();
+
+//        System.out.println("SummaryFile="+SummaryFile);
+//        System.out.println("BankAccountAMFFile="+BankAccountAMF);
+
+        String ParsedSummaryFile=SummaryFile.substring(43,106);
+        System.out.println(ParsedSummaryFile);
+        String ParsedAccountAMFFile=BankAccountAMF.substring(43,116);
+        System.out.println(ParsedAccountAMFFile);
+
+        String[] splittedString1 = ParsedSummaryFile.split("_");
+        List<String> summaryList = Arrays.asList(splittedString1);
+
+        for(int i=0;i<summaryList.size();i++){
+            System.out.println("Parsed summary List are ="+summaryList.get(i));
+        }
+
+        Assert.assertTrue(summaryList.get(0).contains(getLatestStoredProcedureRunTrackerID()));
+        Assert.assertTrue(summaryList.get(1).contains("AnnualManagementFee"));
+        Assert.assertTrue(summaryList.get(3).contains("3000"));
+        Assert.assertTrue(summaryList.get(4).contains("20"));
+        Assert.assertTrue(summaryList.get(5).contains("GBP"));
+
+
+
+
+
+        String[] splittedString2 = ParsedSummaryFile.split("_");
+        List<String> annualManagementFeeList = Arrays.asList(splittedString2);
+
+        for(int i=0;i<annualManagementFeeList.size();i++){
+            System.out.println("Parsed summary List are ="+annualManagementFeeList.get(i));
+        }
+
+        Assert.assertTrue(annualManagementFeeList.get(0).contains(getLatestStoredProcedureRunTrackerID()));
+        Assert.assertTrue(annualManagementFeeList.get(1).contains("AnnualManagementFee"));
+        Assert.assertTrue(annualManagementFeeList.get(3).contains("3000"));
+        Assert.assertTrue(annualManagementFeeList.get(4).contains("20"));
+        Assert.assertTrue(annualManagementFeeList.get(5).contains("GBP"));
+
+
+        return matches;
+
+    }
+}

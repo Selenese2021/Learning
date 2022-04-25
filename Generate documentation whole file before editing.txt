@@ -1,0 +1,582 @@
+package eqtest.sirius.steps;
+
+import eqtest.sirius.db.DividendDBMethods;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import org.junit.Assert;
+
+
+
+
+import java.io.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class GenerateDocumentationSteps {
+
+
+    @Given("I navigate to generated file available in shared path and get the details from {string}")
+    public void iNavigateToGeneratedFileAvailableInSharedPathAndGetTheDetailsFrom(String filepath) {
+
+        String path = filepath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String line = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+                System.out.println(line);
+                //String fileContent = line;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @And("I verify newly added tags {string},{string} and {string} are available in specified {string}")
+    public void iVerifyNewlyAddedTagsAndAreAvailableInSpecified(String tag1, String tag2, String tag3, String filepath) {
+
+        String path = filepath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+                if (filecontent.contains(tag1) && filecontent.contains(tag2) && filecontent.contains(tag3)) {
+                    System.out.println(tag1 + " is added as a new tag");
+                    System.out.println(tag2 + " is added as a new tag");
+                    System.out.println(tag3 + " is added as a new tag");
+                }
+
+                //Assert.assertTrue(filecontent.contains(tag1));
+                //Assert.assertTrue(filecontent.contains(tag2));
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @And("I get the value for StampDutyApplicabletoDRIPPurchase parameter in DividendDRIPSubOffering for {string} as {string}")
+    public void iGetTheValueForStampDutyApplicabletoDRIPPurchaseParameterInDividendDRIPSubOfferingForAs(String offeringID, String parameterValue) throws SQLException, ClassNotFoundException {
+        System.out.println(DividendDBMethods.getStampDutyApplicabletoDRIPPurchaseParameter(offeringID));
+        Assert.assertTrue(DividendDBMethods.getStampDutyApplicabletoDRIPPurchaseParameter(offeringID).contains(parameterValue));
+    }
+
+    @Then("I verify SDR tag value in output file available in {string} is equal to SystemParameter StampDutyPercentage for condition StampDutyApplicabletoDRIPPurchase as enabled in DividendDRIPSubOffering")
+    public void iVerifySDRTagValueInOutputFileAvailableInIsEqualToSystemParameterStampDutyPercentageForConditionStampDutyApplicabletoDRIPPurchaseAsEnabledInDividendDRIPSubOffering(String filepath) throws SQLException, ClassNotFoundException {
+
+        String path = filepath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+
+//                    double SDR = DividendDBMethods.getStampDutyPercentageFromSystemParameter();
+//                    String StampdutyDue = Double.toString(SDR);
+
+                    if (tag1.contains("SDR") && var1.contains("0.5000")) {
+                    //if (tag1.contains("SDR") && var1.contains(StampdutyDue)) {
+                        //Assert.assertEquals(DividendDBMethods.getStampDutyPercentageFromSystemParameter().contains(var1.contains("0.5000")));
+
+                        double SDR = DividendDBMethods.getStampDutyPercentageFromSystemParameter();
+                        String StampdutyDue = Double.toString(SDR);
+                        System.out.println("value from systemparameter" + StampdutyDue);
+                        System.out.println("value from File in SDR TAG" + var1);
+
+                        Assert.assertTrue(var1.contains(StampdutyDue));
+                        System.out.println("Systemparameter value is equal to SDR TAG VALUE");
+
+                    }
+
+                }
+            }
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+    @And("I get the value for Commission Rate,DRIPMinimumFee,DigitalCommissionRate,DigitalDRIPMinimumFee for the {string}")
+    public void iGetTheValueForCommissionRateDRIPMinimumFeeDigitalCommissionRateDigitalDRIPMinimumFeeForThe(String offeringID) throws SQLException, ClassNotFoundException {
+
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("DigitalCommissionRate"));
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("DigitalDRIPMinimumFee"));
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("CommissionRate"));
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("DRIPMinimumFee"));
+
+    }
+
+    @And("I verify CR tag value in output file available in {string} is equal to Commission Rate for {string} in condition DigitalCommissionRateApplied from HoldingDividendDRIPTask is set to No")
+    public void iVerifyCRTagValueInOutputFileAvailableInIsEqualToCommissionRateForInConditionDigitalCommissionRateAppliedFromHoldingDividendDRIPTaskIsSetToNo(String filePath, String offeringID) throws SQLException, ClassNotFoundException {
+
+
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+
+                    if (tag1.contains("CR") && var1.contains("1.0000")) {
+                        //Assert.assertEquals(DividendDBMethods.getStampDutyPercentageFromSystemParameter().contains(var1.contains("0.5000")));
+
+                        List<String> CRTagvalues = new ArrayList<>();
+
+                        DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        Map<String, String> dividendOfferingParameters;
+                        dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        System.out.println(dividendOfferingParameters.get("CommissionRate"));
+                        System.out.println("value from File in CR TAG" + var1);
+
+
+                        Assert.assertTrue(var1.contains(dividendOfferingParameters.get("CommissionRate")));
+                        System.out.println("Commission Rate value is equal to CR TAG VALUE");
+
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @And("I verify DRIPMF tag value in output file available in {string} is equal to DRIPMinimumFee for {string} in condition DigitalCommissionRateApplied from HoldingDividendDRIPTask is set to No")
+    public void iVerifyDRIPMFTagValueInOutputFileAvailableInIsEqualToDRIPMinimumFeeForInConditionDigitalCommissionRateAppliedFromHoldingDividendDRIPTaskIsSetToNo(String filePath, String offeringID) throws SQLException, ClassNotFoundException {
+
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+
+                    if (tag1.contains("DRIPMF") && var1.contains("2.5000")) {
+
+                        DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        Map<String, String> dividendOfferingParameters;
+                        dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        System.out.println(dividendOfferingParameters.get("DRIPMinimumFee"));
+                        System.out.println("value from File in DRIPMF TAG" + var1);
+
+
+                        Assert.assertTrue(var1.contains(dividendOfferingParameters.get("DRIPMinimumFee")));
+                        System.out.println("Commission Rate value is equal to DRIPMF TAG VALUE");
+
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Then("I verify SDR tag value in output file available in {string} is equal to {string} for condition StampDutyApplicableToDRIP from DividendDRIPSubOffering is set to No or not set")
+    public void iVerifySDRTagValueInOutputFileAvailableInIsEqualToForConditionStampDutyApplicableToDRIPFromDividendDRIPSubOfferingIsSetToNoOrNotSet(String filepath, String stampDutyApplicableToDRIP) {
+
+        String path = filepath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+
+                    if (tag1.contains("SDR") && var1.contains("0.0000")) {
+                        //Assert.assertEquals(DividendDBMethods.getStampDutyPercentageFromSystemParameter().contains(var1.contains("0.5000")));
+
+
+                        System.out.println("value from File in SDR TAG" + var1);
+
+                        Assert.assertTrue(var1.contains(stampDutyApplicableToDRIP));
+                        System.out.println("SDR TAG VALUE IS 0.0000");
+
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @And("I get the value for DigitalCommissionRate,DigitalDRIPMinimumFee for the {string}")
+    public void iGetTheValueForDigitalCommissionRateDigitalDRIPMinimumFeeForThe(String offeringID) throws SQLException, ClassNotFoundException {
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("DigitalCommissionRate"));
+        System.out.println(DividendDBMethods.getDividendOfferingParametersForSLA(offeringID).get("DigitalDRIPMinimumFee"));
+    }
+
+
+    @And("I verify CR tag value in output file available in {string} is equal to DigitalCommission Rate for {string} in condition DigitalCommissionRateApplied from HoldingDividendDRIPTask is set to Yes")
+    public void iVerifyCRTagValueInOutputFileAvailableInIsEqualToDigitalCommissionRateForInConditionDigitalCommissionRateAppliedFromHoldingDividendDRIPTaskIsSetToYes(String filePath, String offeringID) throws SQLException, ClassNotFoundException {
+
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+
+                    // String condition1="tag1.contains('CR') && var1.contains('0.5000')";
+
+                    if (tag1.contains("CR") && var1.contains("0.5000")) {
+                        //Assert.assertEquals(DividendDBMethods.getStampDutyPercentageFromSystemParameter().contains(var1.contains("0.5000")));
+
+                        //List<String> CRTagvalues = new ArrayList<>();
+
+                        //DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+
+                        Map<String, String> dividendOfferingParameters;
+                        dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        System.out.println(dividendOfferingParameters.get("DigitalCommissionRate"));
+                        System.out.println("value from File in CR TAG" + var1);
+
+
+                        Assert.assertTrue(var1.contains(dividendOfferingParameters.get("DigitalCommissionRate")));
+                        System.out.println("Commission Rate value is equal to CR TAG VALUE");
+
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @And("I verify DRIPMF tag value in output file available in {string} is equal to DigitalDRIPMinimumFee for {string} in condition DigitalCommissionRateApplied from HoldingDividendDRIPTask is set to Yes")
+    public void iVerifyDRIPMFTagValueInOutputFileAvailableInIsEqualToDigitalDRIPMinimumFeeForInConditionDigitalCommissionRateAppliedFromHoldingDividendDRIPTaskIsSetToYes(String filePath, String offeringID) throws SQLException, ClassNotFoundException {
+
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+
+                    //System.out.println(tag1.toString());
+                    //System.out.println(var1.toString());
+                    //
+                    Map<String, String> dividendOfferingParameters;
+                    dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                    //if (tag1.contains("DRIPMF") && var1.contains("3.0000")) {
+
+                    if (tag1.contains("DRIPMF") && var1.contains(dividendOfferingParameters.get("DigitalDRIPMinimumFee"))) {
+
+
+                        //DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        //Map<String, String> dividendOfferingParameters;
+                        //dividendOfferingParameters = DividendDBMethods.getDividendOfferingParametersForSLA(offeringID);
+
+                        System.out.println(dividendOfferingParameters.get("DigitalDRIPMinimumFee"));
+                        System.out.println("value from File in DRIPMF TAG" + var1);
+
+
+                        Assert.assertTrue(var1.contains(dividendOfferingParameters.get("DigitalDRIPMinimumFee")));
+                        System.out.println("Commission Rate value is equal to DRIPMF TAG VALUE");
+
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    @And("I verify tags available in the generated file available in {string}")
+    public void iVerifyTagsAvailableInTheGeneratedFileAvailableIn(String filePath) {
+
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+                    //System.out.println(tag1.toString());
+
+                    if(tag1.contains("CURN")){
+                        System.out.println("CURN is an existing tag");
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+
+
+
+    @Then("I verify Existing tags {string},{string},{string},{string} and {string} are available in specified {string}")
+    public void iVerifyExistingTagsAndAreAvailableInSpecified(String filePath,  String tag2, String tag3, String tag4, String tag5) {
+        String path = filePath;
+
+        File file = new File(path);
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String filecontent = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while ((filecontent = reader.readLine()) != null) {
+                stringBuilder.append(filecontent);
+                //System.out.println(line);
+
+                String re1 = "<([^>]+)>"; // Tag 1
+                String re2 = "([^<]*)"; // Variable Name 1
+                String re3 = "</([^>]+)>"; // Tag 2
+                //String re3 = re1;
+
+                Pattern p = Pattern.compile(re1 + re2 + re3, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(filecontent);
+                while (m.find()) {
+                    String tag1 = m.group(1);
+                    String var1 = m.group(2);
+
+//                    if(tags1.contains(tag1)){
+//                        System.out.println(tags1 +"is an Existing tag");
+//                    }
+                    if(tag1.contains(tag2)){
+                        System.out.println(tag2 +"is an Existing tag");
+                    }
+                    if(tag1.contains(tag3)){
+                        System.out.println(tag3 +"is an Existing tag");
+                    }
+                    if(tag1.contains(tag4)){
+                        System.out.println(tag4 +"is an Existing tag");
+                    }
+                    if(tag1.contains(tag5)){
+                        System.out.println(tag5 +"is an Existing tag");
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+}
+
+
+
+
+

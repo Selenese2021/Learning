@@ -1,0 +1,41 @@
+https://stackoverflow.com/questions/57869287/selenium-webdriver-wait-for-long-running-queues
+
+
+bool isQueueFinished = false;
+
+while (!isQueueFinished);
+{
+
+    // start webdriver instance to check the queue
+    IWebDriver driver = manager.CreateDriver();
+
+    // check if queue is finished
+    isQueueFinished = CheckIfQueueFinished(driver);
+
+    // if queue is finished, while loop will break
+    // if queue is not finished, close the WebDriver instance, and start again
+
+    if (!isQueueFinished)
+    {
+        // close the WebDriver since we won't need it
+        manager.CloseWebDriverSession();
+
+        // wait another hour
+        Thread.Sleep(TimeSpan.FromHours(1));
+    }
+}
+
+
+
+SELECT JOBID,JOBTYPEID,JOBSTATUSID FROM JOB FROM WHERE JOBTYPEID=100
+
+
+WHILE (JOBSTATUSID!=3){
+
+
+}
+
+
+*******************************************
+
+https://stackoverflow.com/questions/50076540/how-to-wait-in-selenium-for-long-time-effectively
